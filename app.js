@@ -1,3 +1,4 @@
+const { json } = require("express");
 const express = require("express")
 const app = express();
 const cep =[
@@ -68,7 +69,37 @@ app.use("/cep/:valor",(req, res, next)=>{
 })
 app.use("/viacep/:valor",(req, res, next)=>{
   const valor = req.params.valor
-fetch("https://viacep.com.br/ws/"+valor+"/json/").then(resposta=>{local})
+
+  
+fetch("https://viacep.com.br/ws/"+valor+"/json/").then(resposta=>resposta.json()).then(data=>{
+  const dados={
+    cep:data.cep,
+    logradouro:data.logradouro,
+    localidade:data.localidade,
+    ddd:data.ddd
+  }
+  res.send(dados)
+})
+
+})
+app.use("/matricula/:id",(req, res, next)=>{
+  const id = req.params.alunos.filter(alunos)
+const alunos=["ana silva","carlos oliveira","xiaolin matadordeporco","lula","aleglande de morais"]
+const cursos=["Eletricista","Tecnico de Infórmatica","Eleitor do mito","Socorrista mirim","Psicólogo"]
+const matricula=[
+  {'alunos':'0', 'cursos':'2'},
+  {'alunos':'2', 'cursos':'2'},
+  {'alunos':'3', 'cursos':'0'},
+  {'alunos':'2', 'cursos':'1'},
+  {'alunos':'1', 'cursos':'4'},
+  {'alunos':'1', 'cursos':'3'},
+  {'alunos':'0', 'cursos':'0'}
+
+]
+res.send(matricula)
+
+
+
 
 })
 module.exports = app
