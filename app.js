@@ -83,23 +83,39 @@ fetch("https://viacep.com.br/ws/"+valor+"/json/").then(resposta=>resposta.json()
 
 })
 app.use("/matricula/:id",(req, res, next)=>{
-  const id = req.params.alunos.filter(alunos)
-const alunos=["ana silva","carlos oliveira","xiaolin matadordeporco","lula","aleglande de morais"]
+  const id = req.params.id
+  const alunos=["ana silva","carlos oliveira","xiaolin matadordeporco","lula","aleglande de morais"]
 const cursos=["Eletricista","Tecnico de Infórmatica","Eleitor do mito","Socorrista mirim","Psicólogo"]
-const matricula=[
-  {'alunos':'0', 'cursos':'2'},
-  {'alunos':'2', 'cursos':'2'},
-  {'alunos':'3', 'cursos':'0'},
-  {'alunos':'2', 'cursos':'1'},
-  {'alunos':'1', 'cursos':'4'},
-  {'alunos':'1', 'cursos':'3'},
-  {'alunos':'0', 'cursos':'0'}
+const matricula = [
+  {"idaluno":"2","idcurso":"2"},
+  {"idaluno":"3","idcurso":"0"},
+  {"idaluno":"4","idcurso":"3"},
+  {"idaluno":"0","idcurso":"1"},
+  {"idaluno":"1","idcurso":"4"}
+ 
+ ]
+const matriculado = matricula.filter(linha=>linha.idaluno==id)
+  const nomecurso = cursos[matriculado[0].idcurso]
+  const nome = alunos[id]
+  function findByKey (key,value){
+    return(item, i) => item[key] === value
+  }
+  let findParams = findByKey('idcurso',matriculado[0].idcurso)
+  let index = matricula.findIndex(findParams)
+  
+  const resposta = {
+    idaluno:id,
+    nomedoaluno:nome,
+    idmatricula:index,
+    cursomatriculado:nomecurso,
+    mensagem:"dados da matricula"
+  }
 
-]
-res.send(matricula)
 
 
 
 
+
+res.send(resposta)
 })
 module.exports = app
