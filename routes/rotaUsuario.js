@@ -32,7 +32,7 @@ router.get("/",(req,res,next)=>{
         });
     });
 })
-router.get("/login",(req,res,next)=>{
+router.post("/login",(req,res,next)=>{
     const {email,senha} = req.body
     db.get('SELECT * FROM usuario where email=? and senha=?',[email,senha], (error, rows) => {
         if (error) {
@@ -40,10 +40,14 @@ router.get("/login",(req,res,next)=>{
                 error: error.message
             });
         }
-
+    const usuario = {
+        id:rows.id,
+        nome:rows.nome,
+        email:rows.email
+    }
         res.status(200).send({
-            mensagem: "Okaerinasai user-sama",
-            usuarios: rows
+            mensagem: `Okaerinasai ${rows.nome}-sama`,
+            usuarios: usuario
         });
     });
 })
