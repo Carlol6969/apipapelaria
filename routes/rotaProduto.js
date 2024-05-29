@@ -3,11 +3,11 @@ const router = express.Router();
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("database.db");
 db.run(`CREATE TABLE IF NOT EXISTS 
-         usuario (
+         produto (
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
-            nome TEXT, 
-            email TEXT, 
-            senha TEXT)
+            descricao TEXT, 
+            estoqmin integer, 
+            estoqmax integer)
             `, (createTableError) => {
     if (createTableError) {
         return res.status(500).send({
@@ -19,7 +19,7 @@ db.run(`CREATE TABLE IF NOT EXISTS
 
 //consultar todos os dados
 router.get("/",(req,res,next)=>{
-    db.all('SELECT * FROM usuario', (error, rows) => {
+    db.all('SELECT * FROM produto', (error, rows) => {
         if (error) {
             return res.status(500).send({
                 error: error.message
@@ -27,35 +27,16 @@ router.get("/",(req,res,next)=>{
         }
 
         res.status(200).send({
-            mensagem: "Aqui está a lista de todos os Usuarios",
-            usuarios: rows
+            mensagem: "Aqui está a lista de todos os Produtos",
+            produtos: rows
         });
     });
 })
-router.post("/login",(req,res,next)=>{
-    const {email,senha} = req.body
-    db.get('SELECT * FROM usuario where email=? and senha=?',[email,senha], (error, rows) => {
-        if (error) {
-            return res.status(500).send({
-                error: error.message
-            });
-        }
-        
-    const usuario = {
-        id:rows.id,
-        nome:rows.nome,
-        email:rows.email
-    }
-        res.status(200).send({
-            mensagem: `Okaerinasai ${rows.nome}-sama`,
-            usuarios: usuario
-        });
-    });
-})
-//consultar apenas um usuario pelo id
+
+//consultar apenas produt pelo id
 router.get("/:id",(req,res,next)=>{
     const {id} = req.params;
-    db.get('SELECT * FROM usuario', (error, rows) => {
+    db.get('SELECT * FROM produto', (error, rows) => {
         if (error) {
             return res.status(500).send({
                 error: error.message
@@ -63,20 +44,20 @@ router.get("/:id",(req,res,next)=>{
         }
 
         res.status(200).send({
-            mensagem: "Aqui está o cadastro do Usuario",
-            usuario: rows
+            mensagem: "Aqui está o cadastro do Produto",
+            produto: rows
         });
     });
 })
 
-// aqui salvamos dados do usuário
+// aqui salvamos dados do produto
 router.post("/",(req,res,next)=>{
-    const {nome,email,senha} = req.body;
+const {descricao, estoqmax, estoqmin} = req.body;
 db.serialize(()=>{ 
-    const insertUsuario = db.prepare(`
-    INSERT INTO usuario(nome,email,senha)VALUES(?,?,?)`);
-    insertUsuario.run(nome,email,senha)
-    insertUsuario.finalize()
+    const insertProduto = db.prepare(`
+    INSERT INTO produto(descricao,estoqmax,estoqmin)VALUES(?,?,?)`);
+    insertProduto.run(descricao,estoqmax,estoqmin)
+    insertProduto.finalize()
 
 });
 process.on("SIGINT", ()=>{
@@ -87,16 +68,14 @@ process.on("SIGINT", ()=>{
     });
 });
   res.status(200)
-  .send({mensagem:"Usuario salvo com sucesso"
+  .send({mensagem:"Produto salvo com sucesso"
+});
 });
 
- 
-});
-
-// aqui podemos alterar dados do usuário
+// aqui podemos alterar dados do produto
 router.put("/",(req,res,next)=>{
-    const {id,nome,email,senha} = req.body;
-    db.run('UPDATE usuario SET nome=?,email=?,senha=? where id=?',[nome,email,senha,id], (error, rows) => {
+    const {id,descricao,estoqmax,estoqmin} = req.body;
+    db.run('UPDATE produto SET descricao=?,estoqmax=?,estoqmin=? where id=?',[descricao,estoqmax,estoqmin,id], (error, rows) => {
         if (error) {
             return res.status(500).send({
                 error: error.message
@@ -104,7 +83,7 @@ router.put("/",(req,res,next)=>{
            
         }
         res.status(200).send({
-            mensagem: `Usuario de id:${id} foi alterado com sucesso`,
+            mensagem: `Produto de id:${id} foi alterado com sucesso`,
         });
     });
         
@@ -113,7 +92,7 @@ router.put("/",(req,res,next)=>{
  // Aqui podemos deletar o cadastro de um usuário por meio do id
 router.delete("/:id",(req,res,next)=>{
     const {id} = req.params
-    db.run('DELETE FROM usuario where id=?',[id], (error, rows) => {
+    db.run('DELETE FROM produto where id=?',[id], (error, rows) => {
         if (error) {
             return res.status(500).send({
                 error: error.message
@@ -121,7 +100,7 @@ router.delete("/:id",(req,res,next)=>{
            
         }
         res.status(200).send({
-            mensagem: `Usuario de id:${id} deletado com sucesso`,
+            mensagem: `Produto de id:${id} deletado com sucesso`,
         });
     });
         
