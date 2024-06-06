@@ -61,6 +61,7 @@ db.serialize(()=>{
     insertEntrada.finalize()
 
 });
+atualizarestoque(idproduto,qntde,valorunit);
 
 process.on("SIGINT", ()=>{
     db.close((err)=>{
@@ -80,8 +81,8 @@ function atualizarestoque(idproduto,qntde,valorunit,){
                 error: error.message
             });
         }
-        if(rows.length>0){
-            const qntdestoque = rows[0].qntde;
+        if(rows){
+            const qntdestoque = rows.qntde;
             const novaqntde = parseFloat(qntde)+ parseFloat(qntdestoque)
 
 

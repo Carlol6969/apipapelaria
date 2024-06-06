@@ -61,6 +61,7 @@ db.serialize(()=>{
     insertSaida.finalize()
 
 });
+atualizarestoque(idproduto,qntde,valorunit);
 process.on("SIGINT", ()=>{
     db.close((err)=>{
         if (err){
@@ -72,7 +73,41 @@ process.on("SIGINT", ()=>{
   .send({mensagem:"Saída salva com sucesso"
 });
 });
+function atualizarestoque(idproduto,qntde,valorunit,){
+    db.get('SELECT * FROM estoque where idproduto=?',[idproduto], (error, rows) => {
+        if (error) {
+            return res.status(500).send({
+                error: error.message
+            });
+        }
+        if(rows){
+            const qntdestoque = rows.qntde;
+            const novaqntde = parseInt(qntdestoque) - parseInt(qntde) 
 
+
+
+            db.serialize(()=>{ 
+                const updateEstoque = db.prepare(`
+                UPDATE estoque SET qntde=?,valorunit=? Where idproduto=?`);
+                updateEstoque.run(novaqntde,valorunit,idproduto)
+                updateEstoque.finalize()
+            
+            });
+           
+
+        }else{
+            // db.serialize(()=>{ 
+            //     const insertEstoque = db.prepare(`
+            //     INSERT INTO estoque(idproduto,qntde,valorunit)VALUES(?,?,?)`);
+            //     insertEstoque.run(idproduto,qntde,valorunit)
+            //     insertEstoque.finalize()
+            
+            // })
+
+        }
+        
+    })
+}
 // aqui podemos alterar dados do produto
 router.put("/",(req,res,next)=>{
     const {id,idproduto,qntde,valorunit,datasaida} = req.body;
