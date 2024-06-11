@@ -1,0 +1,2 @@
+ALTER TABLE "entrada"  ADD CONSTRAINT "fk_entrada_produto"
+FOREIGN KEY ("idproduto") REFERENCES "produto" ("id");
